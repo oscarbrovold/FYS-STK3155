@@ -44,9 +44,9 @@ def MSE_test_train_complexity(x, y, maxdegree):
     linreg_test.fit(X, MSE_test)
     plt.plot(xplot, linreg_train.predict(X), color='blue', label='MSE training data')
     plt.plot(xplot, linreg_test.predict(X), color='red', label='MSE testing data')
+    '''
     plt.xlabel('Model complexity')
     plt.ylabel('Prediction Error')
-    '''
     plt.plot(xplot, MSE_train, color='blue', label='MSE training data')
     plt.plot(xplot, MSE_test, color='red', label='MSE testing data')
     
