@@ -25,6 +25,7 @@ When applying more noise to the data we get as expected, a higher MSE and a lowe
 ##### Discussion of the MSE (of training and test) as functions of the complexity
 
 ![image](https://github.com/user-attachments/assets/e856b32c-46e9-4260-90d5-37e7ddb65544)
+
 *Figure 1: Test and training data MSE as functions of the polynomial degree.*
 
 There is a good correlation between the MSE for both training and test data at the complexity 8, in addition the MSE is low. I would therefore argue that a polynomial degree of 8 would be optimal without the risk of overfitting.
