@@ -2,8 +2,8 @@
 
 #### Exercise 1
 
-Find all calculations and discussions in the week36_handin.pdf file
+Find all calculations and discussions in the [handin file.](week36_handin.pdf)
 
 #### Exercise 2
 
-Find all code in the exercise2.py file and discussions in the week36_handin.pdf file.  
+Find all code in the [exercise2 file](exercise2.py) and discussions in the [handin file](week36_handin.pdf).
