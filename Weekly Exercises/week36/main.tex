@@ -1,0 +1,230 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage[parfill]{parskip}
+\usepackage{lipsum}
+\usepackage{bm}
+\usepackage{microtype}
+\usepackage{listings}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\title{Weekly Exercises - FYS-STK3155}
+\author{Oscar Atle Brovold}
+\date{Week 36}
+
+\begin{document}
+\maketitle
+\section*{Exercise 1 - Analytical exercises}
+\subsection*{a) Expression for Ridge regression}
+To show that the optimal parameters $\hat{\beta}$ for 
+ridge regression is 
+$$\bm{\hat{\beta}} = (\mathbf{X}^{T}\mathbf{X} + \lambda\mathbf{I})^{-1}\mathbf{X}^{T}\bm{y}$$ 
+we can minimize the following cost-function
+$$C(\mathbf{X}, \bm{\beta}) = \{(\bm{y} - \mathbf{X}\bm{\beta})^{T}(\bm{y} - \mathbf{X}\bm{\beta})\} + \lambda\bm{\beta}^{T}\bm{\beta}$$
+We can rewrite $C(\mathbf{X}, \bm{\beta})$ to 
+$$C(\mathbf{X}, \bm{\beta}) = \bm{y}^{T}\bm{y} - \bm{y}^{T}\mathbf{X}\bm{\beta} - \bm{\beta}^{T}\mathbf{X}^{T}\bm{y} + \bm{\beta}^{T}\mathbf{X}^{T}\mathbf{X}\bm{\beta} + \lambda\bm{\beta}^{T}\bm{\beta}$$
+We have that
+\begin{align}
+    (\bm{y}^{T}\mathbf{X}\bm{\beta})^{T} = \bm{\beta}^{T}\mathbf{X}^{T}\bm{y}  
+\end{align}
+And since (1) is a scaler we have that the transpose of (1) is itself. \\
+We can therefore rewrite $C(\mathbf{X}, \bm{\beta})$ to
+$$C(\mathbf{X}, \bm{\beta}) = \bm{y}^{T}\bm{y} - 2\bm{\beta}^{T}\mathbf{X}^{T}\bm{y} + \bm{\beta}^{T}\mathbf{X}^{T}\mathbf{X}\bm{\beta} + \lambda\bm{\beta}^{T}\bm{\beta}$$
+We can now optimize $C(\mathbf{X}, \bm{\beta})$, we can do this by setting $\frac{\partial C(\mathbf{X}, \bm{\beta})}{\partial \bm{\beta}} = 0.$
+\begin{align*}
+    \frac{\partial C(\mathbf{X}, \bm{\beta})}{\partial \bm{\beta}} &= -2\frac{\partial}{\partial\bm{\beta}}  \bm{\beta}^{T}\mathbf{X}^{T}\bm{y} +  \frac{\partial}{\partial \bm{\beta}} \bm{\beta}^{T}\mathbf{X}^{T}\mathbf{X}\bm{\beta} + \lambda \frac{\partial}{\partial \bm{\beta}} \bm{\beta}^T\bm{\beta} \\
+    &= -2\bm{y}^{T}\mathbf{X} + 2\bm{\beta}^{T}\mathbf{X}^{T}\mathbf{X} + 2 \lambda \bm{\beta}^{T}
+\end{align*}
+Setting this equal to zero yields
+\begin{align*}
+    \bm{y}^{T}\mathbf{X} - \bm{\beta}^{T}\mathbf{X}^{T}\mathbf{X} - \lambda \bm{\beta}^{T} = 0
+\end{align*}
+This rewrites to
+$$\bm{\hat{\beta}} = (\mathbf{X}^{T}\mathbf{X} + \lambda\mathbf{I})^{-1}\mathbf{X}^{T}\bm{y}$$ 
+\subsection*{b) The singular value decomposition}
+\subsubsection*{Ordinary least square (OLS) part}
+To show that we can write the OLS solutions in terms of the eigenvectors of the orthogonal matrix $\mathbf{U}$ as
+$$\bm{\tilde{y}}_{OLS} = \mathbf{X}\bm{\beta}_{OLS} = \sum_{j=0}^{p-1}\bm{u}_{j}\bm{u}_{j}^{T}\bm{y}$$
+We can start with the OLS equation and combine it with the singular value decomposition, meaning
+\begin{align*}
+    \bm{\tilde{y}}_{OLS} = \mathbf{X}\bm{\beta} &= \mathbf{X}(\mathbf{X}^{T}\mathbf{X})^{-1}\mathbf{X}^{T}\bm{y} \\
+    \mathbf{X} &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}
+\end{align*}
+Combining these yields
+\begin{align*}
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}(\mathbf{V}\bm{\tilde{{\Sigma}}}^{2}\mathbf{V}^{T})^{-1}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}\mathbf{V}(\bm{\tilde{{\Sigma}}}^{2})^{-1}\mathbf{V}^{T}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\ 
+    &= \mathbf{U}\bm{\Sigma}(\bm{\tilde{{\Sigma}}}^{2})^{-1}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+\end{align*}
+The expression $\bm{\Sigma}(\bm{\tilde{{\Sigma}}}^{2})^{-1}\mathbf{\Sigma}^{T}$ is a matrix with the same dimensions as $\bm{\Sigma}$.
+If $\bm{\Sigma}$ has p singular values then $\bm{\Sigma}(\bm{\tilde{{\Sigma}}}^{2})^{-1}\mathbf{\Sigma}^{T}$ has p ones along the
+diagonal, and n-p zero columns.  
+This gives 
+$$\bm{\tilde{y}}_{OLS} = \mathbf{U}\mathbf{U}^{T}\bm{y} = \sum_{j=0}^{p-1}\bm{u}_{j}\bm{u}_{j}^{T}\bm{y}$$
+\subsubsection*{Ridge regression part} 
+For Ridge regression we want to show that the corresponsing equation is
+$$\bm{\tilde{y}}_{Ridge} = \mathbf{X}\bm{\beta}_{Ridge} = \sum_{j=0}^{p-1}\bm{u}_{j}\bm{u}_{j}^{T} \frac{\sigma_{j}^{2}}{\sigma_{j}^2 + \lambda} \bm{y}$$
+We start with the optimized cost-function for Ridge and combine it with SVD. 
+\begin{align*}
+    \bm{\tilde{y}}_{Ridge} &= \mathbf{X}\bm{\beta}_{Ridge} = \mathbf{X}(\mathbf{X}^{T}\mathbf{X} + \lambda\mathbf{I})^{-1}\mathbf{X}^{T}\bm{y} \\
+    \mathbf{X} &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}
+\end{align*}
+Combining these yields
+\begin{align*}
+    \bm{\tilde{y}}_{Ridge} &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}(\mathbf{V}\bm{\Sigma}^{T}\mathbf{U}^{T}\mathbf{U}\bm{\Sigma}\mathbf{V}^{T} + \mathbf{I}\lambda)^{-1}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}(\mathbf{V}\bm{\Sigma}^{T}\bm{\Sigma}\mathbf{V}^{T} + \mathbf{I}\lambda)^{-1}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\ 
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}(\mathbf{V}\bm{\tilde{\Sigma}}^{2}\mathbf{V}^{T} + \mathbf{I}\lambda)^{-1}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}(\mathbf{V}\bm{\tilde{\Sigma}}^{2}\mathbf{V}^{T} + \lambda\mathbf{V}\mathbf{V}^{T})^{-1}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}(\mathbf{V}(\bm{\tilde{\Sigma}}^{2} + \lambda\mathbf{I})\mathbf{V}^{T})^{-1}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+    &= \mathbf{U}\bm{\Sigma}\mathbf{V}^{T}\mathbf{V}(\bm{\tilde{\Sigma}}^{2} + \lambda\mathbf{I})^{-1}\mathbf{V}^{T}\mathbf{V}\mathbf{\Sigma}^{T}\mathbf{U}^{T}\bm{y} \\
+    &= \mathbf{U}\bm{\Sigma}(\bm{\tilde{\Sigma}}^{2} + \lambda\mathbf{I})^{-1}\mathbf{\Sigma}\mathbf{U}^{T}\bm{y} \\
+\end{align*} 
+$\bm{\Sigma}(\bm{\tilde{\Sigma}}^{2} + \lambda\mathbf{I})^{-1}\bm{\Sigma}$ is the same situation as for OLS, but
+instead of ones along the diagonal we get $\frac{\sigma_{j}^{2}}{\sigma_{j}^2 + \lambda}$ along the diagonal. 
+In total we therefor have
+$$\bm{\tilde{y}}_{Ridge} = \sum_{j=0}^{p-1}\bm{u}_{j}\bm{u}_{j}^{T} \frac{\sigma_{j}^{2}}{\sigma_{j}^2 + \lambda} \bm{y}$$
+
+\subsection*{Interpreting the results}
+The $\frac{\sigma_{j}^{2}}{\sigma_{j}^2 + \lambda}$ indicates that smaller 
+singular values have a smaller influence on the predicted data compared to large singular values.
+
+We can also see that if $\lambda$ approaches zero the ridge results converges to the OLS betas. Likewise,
+as $\lambda$ increases the penalization effect becomes stronger.
+
+
+
+
+\section*{Exercise 2 - Adding Ridge Regression}
+See code in the exercise2.py file, to see how I calculate the outputs and plots in its fullness.  
+\subsection*{MSE for polynomial of degree 5}
+The datapoints are produced with the following equation
+\begin{lstlisting}[language=Python] 
+x = np.linspace(-3, 3, n).reshape(-1,1) 
+y = np.exp(-x**2) + 1.5 * np.exp(-(x-2)**2) + np.random.normal(0, 0.1, x.shape)
+\end{lstlisting}
+The splitting is done via this function, where we include the intercept
+\begin{lstlisting}[language=Python] 
+def scale_split(x,y,degree):
+    poly = PolynomialFeatures(degree=degree) 
+    design_matrix = poly.fit_transform(x)
+    scaler_X = StandardScaler(with_std=False)
+    scaler_y = StandardScaler(with_std=False)
+    design_matrix = scaler_X.fit_transform(design_matrix)
+    scaled_y = scaler_y.fit_transform(y)
+    design_matrix[:, 0] = 1
+    X_train, X_test, y_train, y_test =\
+    train_test_split(design_matrix, scaled_y, test_size=0.2, random_state=42)
+    return X_train, X_test, y_train, y_test 
+\end{lstlisting}
+For calculating MSE for a polynomial of degree 5, the following function is used
+\begin{lstlisting}[language=Python]
+def poly5():
+    X_train, X_test, y_train, y_test = scale_split(x,y,5)
+    lambdas = [10**i for i in range(-4, 1)]
+    OLS(X_train, X_test, y_train, y_test)
+    for l in lambdas:
+        ridge(X_train, X_test, y_train, y_test, l, 5)
+\end{lstlisting}
+The poly5 calls again on the OLS and ridge function which calculates the related MSE
+
+\begin{lstlisting}[language=Python]    
+def OLS(X_train, X_test, y_train, y_test):
+    beta_opt = np.linalg.inv(X_train.T@X_train)\
+    @X_train.T@y_train
+    MSE_train = MSE(y_train, X_train @ beta_opt)
+    MSE_test = MSE(y_test, X_test @ beta_opt)
+    print('MSE train (OLS) = {:.7f}'.format(MSE_train))
+    print('MSE test (OLS) = {:.7f}'.format(MSE_test))
+
+def ridge(X_train, X_test, y_train, y_test, l, degree):
+    beta_opt = np.linalg.inv(X_train.T@X_train +\
+    l * np.identity(degree + 1))@X_train.T@y_train
+    MSE_train = MSE(y_train, X_train @ beta_opt)
+    MSE_test = MSE(y_test, X_test @ beta_opt)
+    print('\nMSE train (ridge) for lamda: {} =\
+    {:.7f}'.format(l, MSE_train))
+    print('MSE test (ridge) for lamda: {} =\
+    {:.7f}'.format(l, MSE_test))
+    return MSE_train, MSE_test
+
+def MSE(y_data, y_predict):
+    return mean_squared_error(y_data, y_predict)
+\end{lstlisting}
+
+This yields the following output
+\begin{center}
+    \includegraphics[width=0.5\textwidth]{exercise2_part1.png} % Replace with your image file
+\end{center}
+
+\subsection*{MSE for polynomial of degree 10 and 15}
+Now including a function that calculates MSE for degree 10 and 15 aswell.
+
+\begin{lstlisting}[language=Python]    
+def polyN():
+    N = [10, 15]
+    lambdas = [10**i for i in range(-4, 1)]
+    xplot = [10**i for i in range(-4, 1)] 
+    MSE_ridge_train_deg10, MSE_ridge_test_deg10 = [], []
+    MSE_ridge_train_deg15, MSE_ridge_test_deg15 = [], []
+    for n in N:
+        print('\nFits for {} degree polynom\n'.format(n))
+        X_train, X_test, y_train, y_test =\ 
+        scale_split(x,y,n)
+        OLS(X_train, X_test, y_train, y_test)         
+        for l in lambdas:
+            if n == 10:
+                MSE_train, MSE_test = ridge\
+                (X_train, X_test, y_train, y_test, l, n)
+                MSE_ridge_train_deg10.append(MSE_train)
+                MSE_ridge_test_deg10.append(MSE_test)
+            if n == 15:
+                MSE_train, MSE_test = ridge\
+                (X_train, X_test, y_train, y_test, l, n)
+                MSE_ridge_train_deg15.append(MSE_train)
+                MSE_ridge_test_deg15.append(MSE_test)
+
+    plt.plot(np.log10(xplot), MSE_ridge_test_deg10,\ 
+    linestyle=':', color='blue', label='Polynomial \
+    apporximation of degree 10 for testing data')
+    plt.plot(np.log10(xplot), MSE_ridge_train_deg10,\
+    linestyle=':', color='red', label='Polynomial \
+    approximation of degree 10 for training data')
+    plt.plot(np.log10(xplot), MSE_ridge_test_deg15,\ 
+    color='green', label='Polynomial \ 
+    apporximation of degree 15 for testing data')
+    plt.plot(np.log10(xplot), MSE_ridge_train_deg15,\ 
+    color='yellow', label='Polynomial approximation\
+    of degree 15 for training data')
+    plt.xlabel('\lambda-values in log10-base')
+    plt.ylabel('MSE-value')
+    plt.legend()
+    plt.show()
+\end{lstlisting}
+This gives the following plot:
+\begin{center}
+    \includegraphics[width=1\textwidth]{exercise2_part2png.png} 
+\end{center}
+and the following output:
+\begin{center}
+    \includegraphics[width=0.3\textwidth]{exercise2_part2_written.png} 
+\end{center}
+\subsection*{ Discussion of the results for the training MSE and test MSE with Ridge regression and ordinary least squares}
+The overall results suggest that both models, ridge and OLS, predict the data well.
+There is a trend that a higher polynomial degree gives a better fit without overfitting.
+Based on the plot a polynomial degree of 15 with a $\lambda = 0.01$ appears to give the best 
+fit. The MSE from both the test and training set is low, and relatively close. It is also 
+slightly better than the MSE test for the OLS of degree 15.
+
+However, It is importent to note that there has only been used $100$-datapoints, and the results are likely 
+affected by randomness. More data would likely yield more accurate results. 
+
+\hfill
+\begin{center}
+\textbf{--- End of Weekly Exercise ---}
+\end{center}
+
+
+
+
+\end{document}
