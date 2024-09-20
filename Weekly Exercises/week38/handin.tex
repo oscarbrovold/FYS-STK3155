@@ -1,0 +1,138 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[parfill]{parskip}
+\usepackage{lipsum}
+\usepackage{bm}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{graphicx} 
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\bb}[1]{\boldsymbol{#1}}
+\newcommand{\ty}{\tilde{\bb{y}}}
+\graphicspath{ {./figures/} }
+
+\title{Weekly Exercises - FYS-STK3155}
+\author{Oscar Atle Brovold}
+\date{Week 38}
+
+\begin{document}
+\onehalfspacing
+\maketitle
+
+\section*{Part \(i\) - Bias-variance decomposition of MSE}
+We want to show that MSE can be rewritten as follows 
+$$\EE[(\bb{y} - \tilde{\bb{y}})^{2}] = \text{Bias}[\tilde{\bb{y}}] + \text{Var}[\tilde{\bb{y}}] + \sigma^{2}$$
+We can expand the MSE  
+\begin{align*}
+    \EE[(\bb{y} - \tilde{\bb{y}})^{2}] &= \EE[(\bb{y}^{2} + \tilde{\bb{y}}^{2} - 2\bb{y}\tilde{\bb{y}})] \\ 
+    &= \EE[\bb{y}^{2}] + \EE[\ty^{2}] - 2\EE[\bb{y}\ty]
+\end{align*}
+We will now rewrite each term, first $\EE[\bb{y}]$
+\begin{align*}
+    \EE[\bb{y}] &= \text{Var}[\bb{y}] + \EE[\bb{y}]^{2} \\
+    &= \text{Var}[f + \bb{\epsilon}] + \EE[f + \bb{\epsilon}]^{2} \\
+    &= \text{Var}[f]+ \text{Var}[\bb{\epsilon}] + (\EE[f] + \EE[\epsilon])^{2} \\
+    &= \sigma^{2}+ f^{2}
+\end{align*}
+Second $\EE[\ty^{2}]$
+$$\EE[\ty^{2}] = \text{Var}[\ty] + \EE[\ty]^{2}$$
+Last $\EE[\bb{y}\ty]$ 
+\begin{align*}
+    \EE[\bb{y}\ty] &= \EE[(f + \bb{\epsilon})\ty] \\
+    &= \EE[f\ty + \bb{\epsilon}\ty] \\
+    &= f\EE[\ty] + \EE[{\bb{\epsilon}}]\EE[\ty] \\
+    &= f\EE[\ty]
+\end{align*}
+Putting it all together we have
+\begin{align*}
+    \EE[(\bb{y} - \tilde{\bb{y}})^{2}] &= \sigma^{2}+f^{2}+\text{Var}[\ty] + \EE[\ty]^{2} - 2f\EE[\ty] \\
+    &= \sigma^{2} + \text{Var}[\ty] + f^{2} + \EE[\ty]^{2} - 2f\EE[\ty] \\
+    &= \sigma^{2} + \text{Var}[\ty] + (f - \EE[\ty])^{2}
+\end{align*}
+Where the last term is the bias squared, often just called bias (it will always be positive). In total we therefore have
+$$\EE[(\bb{y} - \tilde{\bb{y}})^{2}] = \text{Bias}[\tilde{\bb{y}}] + \text{Var}[\tilde{\bb{y}}] + \sigma^{2}$$
+
+\section*{Part \(ii\) - Discussion of bias and variance}
+\subsection*{Illustration of variance}
+
+In the case of high variance, our model is often overfitted. With sufficent complexity, the model
+can achive its goal of reducing the MSE by interpolating every data point. Consequently, the MSE for the training data 
+converges to zero as the complexity increases. However, this can lead to issues when applying the model to test data.
+The model may become overly specific to the training data, struggling to make accurate prediction on new data/test data.
+This is illustrated in figure \ref{fig1}, where the same dataset is used, the distinction lies in which
+portions are assign to the training and test set. A sign of high variance and overfitting, is that
+the error varies significantly with small changes in the traning set, as demonstrated in figure \ref{fig1}. 
+
+Low variance, as illustrated in figure \ref{fig2} is often a sign of underfitting. There is little variation
+in the predicted model, but the error remains significantly large.
+
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{high_variance_ex1.png}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{high_variance_ex2.png}
+    \end{minipage}\hfill
+    \caption{Overfitted model}
+    \label{fig1}
+\end{figure}
+
+\subsection*{Illustration of bias}
+When we look at the bias in the testing data we look at how consistently the model is making errors. 
+A high bias would indicate that the model makes the same type of errors consistently. A good bias/low bias
+indicates that our model is able to caputure the patterns in the data.
+
+Bias can also be a measure of how well the model can learn patterns in the training set. A high error in the traing set
+indicates a high bias, this is illustrated in figure \ref{fig2}. In figure \ref{fig1}, where the model was overfitted,
+the train error was low, indicating a low bias.  
+
+
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{underfit_1.png}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{underfit_2.png}
+    \end{minipage}\hfill
+    \caption{Underfitted model}
+    \label{fig2}
+\end{figure}
+
+\section*{Part \(iii\) - Bias-variance analysis of a simple one-dimensional}
+I will try to approximate the function
+$$f(x) = e^{-x^2} + 1.5 \cdot e^{-(x-2)^2}$$
+And perform a bias-variance analysis in relation to the complexity. I have also used non-parametric bootstrap, with B=100.
+To the function I have added a gaussian noise, that follows the distrobution
+$$N \sim \mathcal{N}(0, 0.04)$$
+Using OLS as the method of regression, I get the plot in figure \ref{fig3}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Bias_variance.png} % Replace with your image file
+    \caption{Bias-variance as function of the model complexity} % Add your caption text here
+    \label{fig3} 
+\end{figure}
+
+The analysis caputures the discussion in part \(ii\)). When the model complexity is low, the model is underfitted.
+This leads to a high bias, meaning that the model stuggles to capture patterns in the data. At the same time, the variance is low
+because an underfitted model is very general, and changes to what data is included in the training set
+makes small diffrences in the model. As complexity increases the model reaches a point where both
+the bias and variance are relatively low. However, if complexity continues to increase, the variance
+starts to rise. As discussed in part \(ii\), this is a sign of overfitting. Ideally we want a model with 
+low bias and low variance. From figure \ref{fig3} we can observe that the variance and bias reach a minimum around 
+complexity level 8. This would typically be the choice for model complexity.  
+
+\hfill
+\begin{center}
+\textbf{--- End of Weekly Exercise ---}
+\end{center}
+
+\end{document}
